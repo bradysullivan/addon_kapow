@@ -13,11 +13,19 @@ class KapowSystemCaptchaTypeController extends SystemCaptchaTypeController {
 		Loader::library('3rdparty/headwinds2lib', 'kapow');
 		$procURL = Loader::helper('concrete/urls')->getToolsURL('process_url', 'kapow');
 		echo initialize_kapow($procURL);
+		echo '<script type="text/javascript">'.
+		     '$(function() {'.
+		     '$("#kapowField").closest("form").submit(function() {'.
+		     '  kaPowExec();'.
+		     '  return false;'.
+		     '});'.
+		     '});'.
+		     '</script>';
 	}
 	
 	public function label() {
 		$form = Loader::helper('form');
-		print $form->label('captcha', t('Verify yourself.'));
+		print $form->label('captcha', t('Form is kaPoW secured.'));
 	}
 	
 	public function showInput() {}
@@ -25,7 +33,9 @@ class KapowSystemCaptchaTypeController extends SystemCaptchaTypeController {
 	public function check() {
 		$pkg = Package::getByHandle('kapow');
 		Loader::library('3rdparty/headwinds2lib', 'kapow');
-		echo kapow_verify($this->post('kapowField'));
+		if (isset($_POST['kapowField'])) {
+			return kapow_verify($_POST['kapowField']);
+		}
 	}
 
 }
